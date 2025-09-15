@@ -7,10 +7,17 @@ settings:
 importers:
 
   .:
+    dependencies:
+      ohm-js:
+        specifier: 17.1.0
+        version: 17.1.0
     devDependencies:
       '@ohm-js/cli':
         specifier: ^2.0.0
         version: 2.0.0(ohm-js@17.1.0)
+      '@tvm/mark':
+        specifier: workspace:*
+        version: link:../mark
       '@types/jest':
         specifier: ^29.5.14
         version: 29.5.14
