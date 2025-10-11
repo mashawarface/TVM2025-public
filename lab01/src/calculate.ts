@@ -3,7 +3,6 @@ import grammar, { AddMulActionDict } from "./addmul.ohm-bundle";
 
 export const addMulSemantics: AddMulSemantics = grammar.createSemantics() as AddMulSemantics;
 
-
 const addMulCalc = {
     number(digit) {
         return Number.parseInt(digit.sourceString);

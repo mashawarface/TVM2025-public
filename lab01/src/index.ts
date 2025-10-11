@@ -6,6 +6,7 @@ export function evaluate(content: string): number
 {
     return calculate(parse(content));
 }
+
 export class SyntaxError extends Error
 {
 }
