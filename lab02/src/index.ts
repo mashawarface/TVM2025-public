@@ -4,7 +4,7 @@ import { rpnSemantics } from "./semantics";
 
 export function evaluate(source: string): number
 { 
-    const res = grammar.match(source);
+    var res = grammar.match(source);
 
     if (res.failed()) {
         throw new SyntaxError(res.shortMessage);
@@ -15,7 +15,19 @@ export function evaluate(source: string): number
 
 export function maxStackDepth(source: string): number
 { 
-    throw "Not implemented";
+    var res = grammar.match(source);
+
+    if (res.failed()) {
+        throw new SyntaxError(res.shortMessage);
+    }
+
+    var resStackDepth = rpnSemantics(res).stackDepth;
+
+    if (resStackDepth.out != 1) {
+        throw new SyntaxError();
+    }
+
+    return resStackDepth.max;
 }
 
 export class SyntaxError extends Error
