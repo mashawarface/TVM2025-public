@@ -1,4 +1,4 @@
-export type Expr = NumConst | Variable | BinaryOp | UnaryOp | Paren;
+export type Expr = NumConst | Variable | BinaryOp | UnaryOp;
 
 export interface NumConst {
   type: "const";
@@ -21,9 +21,4 @@ export interface UnaryOp {
   type: "unary";
   op: "-";
   arg: Expr;
-}
-
-export interface Paren {
-  type: "paren";
-  expr: Expr;
 }

@@ -1,14 +1,17 @@
-import { Expr, NumConst, Variable, BinaryOp, UnaryOp, Paren } from "./ast";
+import { Expr, NumConst, Variable, BinaryOp, UnaryOp } from "./ast";
 
-const PRECEDENCE: { [key: string]: number } = {
+const PRECEDENCE: { [op: string]: number } = {
   "+": 1,
   "-": 1,
   "*": 2,
   "/": 2,
-  "unary-": 3,
 };
 
-export function printExpr(expr: Expr, parentPrecedence: number = 0): string {
+export function printExpr(
+  expr: Expr,
+  parentOp?: string,
+  isRight: boolean = false
+): string {
   switch (expr.type) {
     case "const":
       return expr.value.toString();
@@ -16,44 +19,26 @@ export function printExpr(expr: Expr, parentPrecedence: number = 0): string {
     case "var":
       return expr.value;
 
-    case "paren":
-      const innerExpr = expr.expr;
-
-      if (
-        innerExpr.type === "const" ||
-        innerExpr.type === "var" ||
-        innerExpr.type === "unary"
-      ) {
-        return printExpr(innerExpr, parentPrecedence);
-      }
-
-      if (innerExpr.type === "binary") {
-        const innerPrecedence = PRECEDENCE[innerExpr.op];
-
-        if (innerPrecedence > parentPrecedence) {
-          return printExpr(innerExpr, parentPrecedence);
-        }
-      }
-
-      return `(${printExpr(innerExpr)})`;
-
     case "unary":
-      const unaryPrecedence = PRECEDENCE["unary-"];
-      const argStr = printExpr(expr.arg, unaryPrecedence);
-      const result = `-${argStr}`;
-      return unaryPrecedence < parentPrecedence ? `(${result})` : result;
+      const argStr = printExpr(expr.arg, "unary-", false);
+      if (parentOp && (parentOp === "+" || parentOp === "-")) {
+        return `-${argStr}`;
+      }
+      return `-${argStr}`;
 
     case "binary":
-      const currentPrecedence = PRECEDENCE[expr.op];
+      const needsParens =
+        parentOp !== undefined &&
+        (PRECEDENCE[parentOp] > PRECEDENCE[expr.op] ||
+          (PRECEDENCE[parentOp] === PRECEDENCE[expr.op] &&
+            isRight &&
+            (parentOp !== expr.op || parentOp === "-" || parentOp === "/")));
 
-      const leftStr = printExpr(expr.left, currentPrecedence);
-      const rightStr = printExpr(expr.right, currentPrecedence);
+      const leftStr = printExpr(expr.left, expr.op, false);
+      const rightStr = printExpr(expr.right, expr.op, true);
+      const result = `${leftStr} ${expr.op} ${rightStr}`;
 
-      const resultStr = `${leftStr} ${expr.op} ${rightStr}`;
-
-      return currentPrecedence < parentPrecedence
-        ? `(${resultStr})`
-        : resultStr;
+      return needsParens ? `(${result})` : result;
 
     default:
       throw new Error(`Unknown expression type: ${(expr as any).type}`);

@@ -5,8 +5,32 @@ import {
   ArithmeticSemantics,
   SyntaxError,
 } from "../../lab03";
-import { Expr, NumConst, Variable, BinaryOp, UnaryOp, Paren } from "./ast";
+import { Expr, NumConst, Variable, BinaryOp, UnaryOp } from "./ast";
 import { arithSemantics } from "lab03/src/calculate";
+
+import { NonterminalNode } from "ohm-js";
+
+function parseBinary(
+  first: NonterminalNode,
+  ops: NonterminalNode,
+  rest: NonterminalNode
+): BinaryOp {
+  let res = first.parse();
+
+  for (let i = 0; i < ops.children.length; i++) {
+    const rightRes = rest.child(i).parse();
+    const op = ops.child(i).sourceString;
+
+    res = {
+      type: "binary",
+      op: op,
+      left: res,
+      right: rightRes,
+    } as BinaryOp;
+  }
+
+  return res;
+}
 
 export const getExprAst: ArithmeticActionDict<Expr> = {
   number(digits) {
@@ -24,51 +48,12 @@ export const getExprAst: ArithmeticActionDict<Expr> = {
   },
 
   Paren(_lparen, expr, _rparen) {
-    return {
-      type: "paren",
-      expr: expr.parse(),
-    } as Paren;
+    return expr.parse();
   },
 
-  Sum(expr0, _addOp, expr2) {
-    var res = expr0.parse();
+  Sum: parseBinary,
 
-    for (var i = 0; i < expr2.children.length; i++) {
-      var rightRes = expr2.child(i).parse();
-      var _op = _addOp.child(i).sourceString;
-
-      res = {
-        type: "binary",
-        op: _op,
-        left: res,
-        right: rightRes,
-      } as BinaryOp;
-    }
-
-    return res;
-  },
-
-  Mul(expr0, _mulOp, expr2) {
-    var res = expr0.parse();
-
-    for (var i = 0; i < expr2.children.length; i++) {
-      var rightRes = expr2.child(i).parse();
-      var _op = _mulOp.child(i).sourceString;
-
-      if (_op === "/" && rightRes === 0) {
-        throw new Error();
-      }
-
-      res = {
-        type: "binary",
-        op: _op,
-        left: res,
-        right: rightRes,
-      } as BinaryOp;
-    }
-
-    return res;
-  },
+  Mul: parseBinary,
 
   Neg_neg(_minus, expr) {
     return {
