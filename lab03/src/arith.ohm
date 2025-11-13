@@ -10,6 +10,6 @@ Arithmetic {
 
     Atom = number | variable | Paren 
     Paren = "(" Sum ")"
-    variable = letter alnum*
+    variable = letter+
     number = digit+
 }

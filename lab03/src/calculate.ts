@@ -12,7 +12,7 @@ const arithCalc = {
     return Number.parseInt(digit.sourceString);
   },
 
-  variable(letter, alnum) {
+  variable(letter) {
     return this.args.params[this.sourceString];
   },
 
