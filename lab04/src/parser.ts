@@ -5,8 +5,7 @@ import {
   ArithmeticSemantics,
   SyntaxError,
 } from "../../lab03";
-import { Expr, NumConst, Variable, BinaryOp, UnaryOp } from "./ast";
-import { arithSemantics } from "lab03/src/calculate";
+import { Expr, Number, Variable, BinaryOp, UnaryOp } from "./ast";
 
 import { NonterminalNode } from "ohm-js";
 
@@ -35,7 +34,7 @@ function parseBinary(
 export const getExprAst: ArithmeticActionDict<Expr> = {
   number(digits) {
     const value = parseInt(this.sourceString);
-    return { type: "const", value } as NumConst;
+    return { type: "num", value } as Number;
   },
 
   variable(string) {
@@ -58,7 +57,6 @@ export const getExprAst: ArithmeticActionDict<Expr> = {
   Neg_neg(_minus, expr) {
     return {
       type: "unary",
-      op: "-",
       arg: expr.parse(),
     } as UnaryOp;
   },

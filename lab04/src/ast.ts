@@ -1,7 +1,7 @@
-export type Expr = NumConst | Variable | BinaryOp | UnaryOp;
+export type Expr = Number | Variable | BinaryOp | UnaryOp;
 
-export interface NumConst {
-  type: "const";
+export interface Number {
+  type: "num";
   value: number;
 }
 
@@ -19,6 +19,5 @@ export interface BinaryOp {
 
 export interface UnaryOp {
   type: "unary";
-  op: "-";
   arg: Expr;
 }

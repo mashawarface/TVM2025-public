@@ -1,19 +1,19 @@
-import { BinaryOp, Expr, NumConst, UnaryOp } from "../../lab04";
+import { BinaryOp, Expr, Number, UnaryOp } from "../../lab04";
 
 function isZero(e: Expr): boolean {
-  return e.type === "const" && e.value === 0;
+  return e.type === "num" && e.value === 0;
 }
 
 function isOne(e: Expr): boolean {
-  return e.type === "const" && e.value === 1;
+  return e.type === "num" && e.value === 1;
 }
 
 function makeUnary(e: Expr): UnaryOp {
-  return { type: "unary", op: "-", arg: e };
+  return { type: "unary", arg: e };
 }
 
-function makeNumber(value: number): NumConst {
-  return { type: "const", value };
+function makeNumber(value: number): Number {
+  return { type: "num", value };
 }
 
 function makeBinary(
@@ -27,14 +27,14 @@ function makeBinary(
 function simplifyUnary(e: Expr): Expr {
   if (isZero(e)) return makeNumber(0);
   if (e.type === "unary") return e.arg;
-  if (e.type === "const") return makeNumber(-e.value);
+  if (e.type === "num") return makeNumber(-e.value);
   return makeUnary(e);
 }
 
 function simplifyAdd(left: Expr, right: Expr): Expr {
   if (isZero(left)) return right;
   if (isZero(right)) return left;
-  if (left.type === "const" && right.type === "const")
+  if (left.type === "num" && right.type === "num")
     return makeNumber(left.value + right.value);
 
   return makeBinary("+", left, right);
@@ -43,7 +43,7 @@ function simplifyAdd(left: Expr, right: Expr): Expr {
 function simplifySub(left: Expr, right: Expr): Expr {
   if (isZero(right)) return left;
   if (isZero(left)) return simplifyUnary(right);
-  if (left.type === "const" && right.type === "const")
+  if (left.type === "num" && right.type === "num")
     return makeNumber(left.value - right.value);
 
   return makeBinary("-", left, right);
@@ -53,11 +53,11 @@ function simplifyMul(left: Expr, right: Expr): Expr {
   if (isZero(left) || isZero(right)) return makeNumber(0);
   if (isOne(left)) return right;
   if (isOne(right)) return left;
-  if (left.type === "const" && right.type === "const")
+  if (left.type === "num" && right.type === "num")
     return makeNumber(left.value * right.value);
-  if (left.type === "const" && left.value < 0)
+  if (left.type === "num" && left.value < 0)
     return makeUnary(makeBinary("*", makeNumber(-left.value), right));
-  if (right.type === "const" && right.value < 0)
+  if (right.type === "num" && right.value < 0)
     return makeUnary(makeBinary("*", left, makeNumber(-right.value)));
 
   return makeBinary("*", left, right);
@@ -66,11 +66,11 @@ function simplifyMul(left: Expr, right: Expr): Expr {
 function simplifyDiv(left: Expr, right: Expr): Expr {
   if (isZero(left)) return makeNumber(0);
   if (isOne(right)) return left;
-  if (left.type === "const" && right.type === "const")
+  if (left.type === "num" && right.type === "num")
     return makeNumber(left.value / right.value);
-  if (left.type === "const" && left.value < 0)
+  if (left.type === "num" && left.value < 0)
     return makeUnary(makeBinary("/", makeNumber(-left.value), right));
-  if (right.type === "const" && right.value < 0)
+  if (right.type === "num" && right.value < 0)
     return makeUnary(makeBinary("/", left, makeNumber(-right.value)));
 
   return makeBinary("/", left, right);
@@ -78,7 +78,7 @@ function simplifyDiv(left: Expr, right: Expr): Expr {
 
 export function derive(e: Expr, varName: string): Expr {
   switch (e.type) {
-    case "const":
+    case "num":
       return makeNumber(0);
 
     case "var":

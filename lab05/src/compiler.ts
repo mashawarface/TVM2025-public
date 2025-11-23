@@ -3,36 +3,31 @@ import { Expr } from "@tvm/lab04";
 import { buildOneFunctionModule, Fn } from "./emitHelper";
 const { i32, get_local } = C;
 
-function walk(expr: Expr, varSet: Set<string>, result: string[]): void {
-  switch (expr.type) {
-    case "const":
-      return;
+export function getVariables(e: Expr): string[] {
+  switch (e.type) {
+    case "num":
+      return [];
 
     case "var":
-      if (!varSet.has(expr.value)) {
-        varSet.add(expr.value);
-        result.push(expr.value);
-      }
-      return;
+      return [e.value];
 
     case "unary":
-      walk(expr.arg, varSet, result);
-      return;
+      return getVariables(e.arg);
 
     case "binary":
-      walk(expr.left, varSet, result);
-      walk(expr.right, varSet, result);
-      return;
+      const result = getVariables(e.left);
+
+      for (const item of getVariables(e.right)) {
+        if (!result.includes(item)) {
+          result.push(item);
+        }
+      }
+
+      return result;
+
+    default:
+      throw new Error("Uknown type");
   }
-}
-
-export function getVariables(e: Expr): string[] {
-  const varSet = new Set<string>();
-  const result: string[] = [];
-
-  walk(e, varSet, result);
-
-  return result;
 }
 
 export async function buildFunction(
@@ -45,7 +40,7 @@ export async function buildFunction(
 
 function wasm(e: Expr, args: string[]): Op<I32> {
   switch (e.type) {
-    case "const":
+    case "num":
       return i32.const(e.value);
 
     case "var":

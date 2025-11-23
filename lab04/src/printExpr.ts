@@ -1,4 +1,4 @@
-import { Expr, NumConst, Variable, BinaryOp, UnaryOp } from "./ast";
+import { Expr, Number, Variable, BinaryOp, UnaryOp } from "./ast";
 
 const PRECEDENCE: { [op: string]: number } = {
   "+": 1,
@@ -13,7 +13,7 @@ export function printExpr(
   isRight: boolean = false
 ): string {
   switch (expr.type) {
-    case "const":
+    case "num":
       return expr.value.toString();
 
     case "var":
