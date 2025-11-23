@@ -20,15 +20,12 @@ export function printExpr(
       return expr.value;
 
     case "unary":
-      const argStr = printExpr(expr.arg, "unary-", false);
-      if (parentOp && (parentOp === "+" || parentOp === "-")) {
-        return `-${argStr}`;
-      }
+      const argStr = printExpr(expr.arg, undefined, false);
       return `-${argStr}`;
 
     case "binary":
       const needsParens =
-        parentOp !== undefined &&
+        parentOp &&
         (PRECEDENCE[parentOp] > PRECEDENCE[expr.op] ||
           (PRECEDENCE[parentOp] === PRECEDENCE[expr.op] &&
             isRight &&
@@ -41,6 +38,6 @@ export function printExpr(
       return needsParens ? `(${result})` : result;
 
     default:
-      throw new Error(`Unknown expression type: ${(expr as any).type}`);
+      throw new Error("Unknown expression type");
   }
 }

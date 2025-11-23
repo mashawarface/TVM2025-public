@@ -51,7 +51,7 @@ function wasm(e: Expr, args: string[]): Op<I32> {
     case "var":
       const index = args.indexOf(e.value);
       if (index === -1) {
-        throw new WebAssembly.RuntimeError("Var doesn`t found: ${e.value}");
+        throw new WebAssembly.RuntimeError("Var doesn't found");
       }
 
       return get_local(i32, index);
@@ -77,9 +77,9 @@ function wasm(e: Expr, args: string[]): Op<I32> {
           return i32.div_s(left, right);
 
         default:
-          throw new Error("Unkdown operation: ${e.op}");
+          throw new Error("Unkdown operation");
       }
     default:
-      throw new Error("Uknown expr type: ${e.type}");
+      throw new Error("Uknown expr type");
   }
 }
