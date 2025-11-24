@@ -3,31 +3,35 @@ import { Expr } from "@tvm/lab04";
 import { buildOneFunctionModule, Fn } from "./emitHelper";
 const { i32, get_local } = C;
 
-export function getVariables(e: Expr): string[] {
+export function getVariablesImpl(e: Expr, vars: Set<string>) {
   switch (e.type) {
     case "num":
-      return [];
+      break;
 
     case "var":
-      return [e.value];
+      vars.add(e.value);
+      break;
 
     case "unary":
-      return getVariables(e.arg);
+      getVariablesImpl(e.arg, vars);
+      break;
 
     case "binary":
-      const result = getVariables(e.left);
-
-      for (const item of getVariables(e.right)) {
-        if (!result.includes(item)) {
-          result.push(item);
-        }
-      }
-
-      return result;
+      getVariablesImpl(e.left, vars);
+      getVariablesImpl(e.right, vars);
+      break;
 
     default:
       throw new Error("Uknown type");
   }
+}
+
+export function getVariables(e: Expr) {
+  const vars = new Set<string>();
+
+  getVariablesImpl(e, vars);
+
+  return [...vars];
 }
 
 export async function buildFunction(
@@ -45,8 +49,9 @@ function wasm(e: Expr, args: string[]): Op<I32> {
 
     case "var":
       const index = args.indexOf(e.value);
+
       if (index === -1) {
-        throw new WebAssembly.RuntimeError("Var doesn't found");
+        throw new WebAssembly.RuntimeError(`Var '${e.value}' isn't found`);
       }
 
       return get_local(i32, index);

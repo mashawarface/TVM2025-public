@@ -14,18 +14,18 @@ function parseBinary(
   ops: NonterminalNode,
   rest: NonterminalNode
 ): BinaryOp {
-  let res = first.parse();
+  let res = first.parse() as BinaryOp;
 
   for (let i = 0; i < ops.children.length; i++) {
     const rightRes = rest.child(i).parse();
-    const op = ops.child(i).sourceString;
+    const op = ops.child(i).sourceString as "+" | "-" | "*" | "/";
 
     res = {
       type: "binary",
       op: op,
       left: res,
       right: rightRes,
-    } as BinaryOp;
+    };
   }
 
   return res;
@@ -51,7 +51,6 @@ export const getExprAst: ArithmeticActionDict<Expr> = {
   },
 
   Sum: parseBinary,
-
   Mul: parseBinary,
 
   Neg_neg(_minus, expr) {
